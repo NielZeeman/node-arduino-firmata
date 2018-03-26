@@ -1,7 +1,7 @@
 'use strict'
 
 events = require 'eventemitter2'
-{SerialPort} = serialport = require 'serialport'
+serialport = require 'serialport'
 
 debug = require('debug')('arduino-firmata')
 
@@ -42,6 +42,7 @@ exports = module.exports = class ArduinoFirmata extends events.EventEmitter2
       callback null, devices
 
   constructor: ->
+    super()
     @status = ArduinoFirmata.Status.CLOSE
     @wait_for_data = 0
     @execute_multi_byte_command = 0
@@ -57,7 +58,7 @@ exports = module.exports = class ArduinoFirmata extends events.EventEmitter2
   isOldArduinoDevice: ->
     return /usbserial|USB/.test @serialport_name
 
-  connect: (@serialport_name, opts={baudrate: 57600}) ->
+  connect: (@serialport_name, opts={baudRate: 57600}) ->
     opts.parser = serialport.parsers.raw
     unless @serialport_name
       ArduinoFirmata.list (err, devices) =>
@@ -82,7 +83,7 @@ exports = module.exports = class ArduinoFirmata extends events.EventEmitter2
         @emit 'connect'
       , io_init_wait
 
-    @serialport = new SerialPort @serialport_name, opts
+    @serialport = new serialport @serialport_name, opts
     @serialport.once 'open', =>
       cid = setInterval =>
         debug 'request REPORT_VERSION'
